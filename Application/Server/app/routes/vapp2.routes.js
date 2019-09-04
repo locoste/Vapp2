@@ -18,7 +18,7 @@ module.exports = function(app) {
       host: 'localhost',
       port: 3306,
       user: 'root',
-      password: 'Lamoule07130',
+      password: 'root',
       database: 'vapp2'
     };
 
@@ -70,6 +70,9 @@ module.exports = function(app) {
     // display all login page images
     app.get('/images/:image', controller.displayImages);
 
+    // get css files
+    app.get('/css/:file', controller.getCssFiles);
+    
     // get favicon.ico
     app.get('/favicon.ico', controller.favicon)
 
