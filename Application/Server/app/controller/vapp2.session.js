@@ -5,12 +5,26 @@ const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var request = require('../database/requestToDatabase.js')
+var con;
+var http = require('http');
+
+const odbc_url = process.env.ODBC_URL; 
+const odbc_port = process.env.ODBC_PORT;
+
+/*if (con == undefined){
+  con = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'dhuebwsa',
+    database: 'vapp2'
+  });
+}*/
 
 	passport.use(new LocalStrategy(
 		{ usernameField: 'email' },
 		(email, password, done) => {
 		var query = 'SELECT * FROM users;'	
-		request.getRequestdb(query, function(result){
+		odbcConnector(query, function(result){
 			for (var i = 0; i < result.length; i++){
 				if(result[i].login==email && result[i].password==password){
 					var user = '{"id":' + result[i].user_id + ',"email":"' + result[i].email + '", "login":"' + result[i].login + '", "password":"' + result[i].password + '", "role":"'+result[i].role+'"}';
@@ -30,7 +44,7 @@ var request = require('../database/requestToDatabase.js')
 
 	passport.deserializeUser((id, done) => {
 		var query = 'SELECT * FROM users WHERE user_id = ' + id;
-		request.getRequestdb(query, function(result){
+		odbcConnector(query, function(result){
 			if (result[0].user_id === id){
 				var user='{"id":'+result[0].user_id+', "login":"'+result[0].login+'","password":"'+result[0].password+'","customer":'+result[0].customer+',"role":"'+result[0].role+'"}'
 				var user =  JSON.parse(user);
@@ -85,3 +99,36 @@ var request = require('../database/requestToDatabase.js')
 	    console.log('redirect to login.html');
     	res.redirect('/login.html')
     }
+
+    function odbcConnector(request, callback){
+  try {
+    const id = {
+      host : odbc_url,
+      path: '/api/odbcModels/requestdb?request='+escape(request),
+      port: odbc_port,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };  
+
+    const idCallback = function(response) {
+      let str = '';
+      response.on('data', function(chunk) {
+        str += chunk;
+      });
+
+      response.on('end', function(){
+        var result = JSON.parse(str)
+        callback(result.request);
+      })
+    }
+
+    const idReq = http.request(id, idCallback);
+    idReq.end();
+  } catch(e){
+    console.log(e)
+  }
+}
+
+

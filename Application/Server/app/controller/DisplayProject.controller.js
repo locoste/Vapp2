@@ -3,7 +3,7 @@ app.controller('DisplayProject', function($scope, $http, config) {
   const port = config.api_port;
 
   var project = getProject();
-  document.getElementById("addNewFeature").href="NewFeatures.html?" + project;
+  //*document.getElementById("addNewFeature").href="NewFeatures.html?" + project;
   document.getElementById("hrefOrder").href="Order.html?"+project
   $http.get('http://'+url+':'+port+'/getProject/' + project).then(function(response) {
     console.log(response.data)

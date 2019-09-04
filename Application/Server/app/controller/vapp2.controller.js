@@ -26,14 +26,14 @@ var config =
  database:default_database
 };
 
-if (con == undefined){
+/*if (con == undefined){
   con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Lamoule07130',
-    database: 'tardy_scheduler'
+    password: 'dhuebwsa',
+    database: 'vapp2'
   });
-}
+}*/
 
 const alf_url = process.env.ALF_URL;
 const alf_port = process.env.ALF_PORT;
@@ -566,4 +566,16 @@ function sendEmail(object, text){
     }
     transporter.close();
   });
+}
+
+exports.getCssFiles = function(req, res){
+var file = req.params.file;
+res.writeHead(200, {"Content-Type": "text/css"});
+fs.readFile('../View/css/'+file, function(err, css){
+if(err){  
+ throw err;
+}
+ res.write(css);
+ res.end();   
+})
 }
