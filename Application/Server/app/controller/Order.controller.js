@@ -3,7 +3,7 @@ app.controller('Order', function($scope, $http, config) {
   const port = config.api_port;
 
   var project = getProject();
-  document.getElementById("BackButton").href="DisplayProject.html?" + project;
+  // document.getElementById("BackButton").href="DisplayProject.html?" + project;
 
   $http.get('http://'+url+':'+port+'/getUserCompany').then(function(response){
     $scope.User = response.data.companies.company;

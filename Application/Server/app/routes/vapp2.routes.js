@@ -13,12 +13,12 @@ module.exports = function(app) {
     var busboy = require('connect-busboy');
 
     var fs = require('fs');
-
+ 
     var options = {
       host: 'localhost',
       port: 3306,
       user: 'root',
-      password: 'root',
+      password: 'Lamoule07130',
       database: 'vapp2'
     };
 
@@ -149,7 +149,7 @@ module.exports = function(app) {
     app.get('/getUserCompany', contSession.authrequired, controller.getCompanies);
 
     // get documents for a project
-    app.get('/getProjectFiles/:project/:company', contSession.authrequired, controller.getProjectFiles);
+    app.get('/getProjectFiles/:project', contSession.authrequired, controller.getProjectFiles);
 
     // get step document for a feature
     app.get('/getDocuments/:feature', contSession.authrequired, controller.getFiles);

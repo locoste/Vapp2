@@ -10,10 +10,10 @@ require('./app/routes/vapp2.routes.js')(app);
 
 const port = process.env.PORT;
 const url = process.env.API_URL;
-
+console.log(port)
+console.log(url)
 // Create a Server
 var server = app.listen(port, function () {
-
 
   console.log("App listening at http://%s:%s", url, port)
 

@@ -146,10 +146,14 @@ function processMasteryDegree(refArticle, quantity, price, callback){
         case (rebusTot>=4*rebusMax):
           coeffrebus = 1.5;
       }
-      degreemasteryprocess = tpGammeProdTheoCmde/tpgammeTheoCmde*coeffrebus*100+100;
-      coutTheoProdCmde = ofsResult[0].prevth*quantity;
-      margeProduction = coutTheoProdCmde;
-      callback(degreemasteryprocess, rebusTot*100, coutTheoProdCmde);
+      degreemasteryprocess = tpGammeProdTheoCmde/(tpgammeTheoCmde*coeffrebus)+100;//*100+100;
+      var queryArt = "Select codart, drprve from artgen where codart = '"+refArticle+"';"
+      getDataAPR(queryArt, function(sellPrice){
+        console.log(sellPrice)
+        coutTheoProdCmde = sellPrice[0].drprve*0.9*quantity;
+        margeProduction = coutTheoProdCmde;
+        callback(degreemasteryprocess, rebusTot*100, coutTheoProdCmde);
+      })
     })
   })
 }
@@ -271,10 +275,12 @@ exports.analyseArticles = function(project, callback){
   var queryanalysis = "SELECT * FROM feature_analysis"
   odbcConnector(query, function(result){
     odbcConnector(queryanalysis, function(resultAnalysis){
+      console.log(resultAnalysis)
       for(const line of result){
         var done=false;
         for(const item of resultAnalysis){
           if(line.part_reference==item.part_reference && line.quantity==item.quantity){
+            console.log(line.part_reference+' ahs already be calculated')
             resultDataAnalysis.push({feature_id:item.feature, feature:item.part_reference, quantity:item.quantity, coefficient: item.coefficient, masteryDegree: item.mastery_degree, rebus: item.rebus, costProd: item.cost_production });
             done=true;
             console.log('1')
@@ -288,6 +294,7 @@ exports.analyseArticles = function(project, callback){
           confidenceCoefficient(line.part_reference, line.quantity, 0, function(coeff, degree, rebus, costProd){
             resultDataAnalysis.push({feature_id:line.feature_id, feature:line.part_reference, quantity:line.quantity, coefficient: coeff, masteryDegree: degree, rebus: rebus, costProd: costProd });
             var queryInsert = "INSERT INTO feature_analysis(feature, quantity, coefficient, mastery_degree, rebus, cost_production, part_reference) VALUES ("+line.feature_id+","+line.quantity+","+coeff+", "+degree+", "+rebus+", "+costProd+", '"+line.part_reference+"')"
+            console.log(line.part_reference)
             odbcConnector(queryInsert, function(response){console.log('insert with success')});
             console.log('comparaison compt: '+resultDataAnalysis.length+' / '+result.length)
             if(resultDataAnalysis.length==result.length){

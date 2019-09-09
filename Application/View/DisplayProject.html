@@ -38,7 +38,7 @@
 
                 <div class="col-md-3" style="padding-top: 12px;">
                   <div class="header_icons">
-                    <a class="header_a" href="UserPage.html?{{User}}"> {{User}}
+                    <a class="header_a" href="UserPage.html?{{User}}">{{User}} 
                       <i class="fas fa-user-circle fa-2x"></i>
                     </a>
                     <a classe="header_a" href="Accueil.html"> 
@@ -191,11 +191,11 @@
               <h2>Project Features</h2>
               <table>
                   <thead>
-                    <th hidden>id</th><th>Name</th><th>Description</th><th>Date</th><th>Attribution</th><th>Status</th>
+                    <th hidden></th><th>Name</th><th>Description</th><th>Date</th><th>Attribution</th><th>Status</th>
                   </thead>
                   <tbody>
                   <tr ng-repeat="x in featuresInformation">
-                    <td>{{x.feature_id}}</td>
+                    <td type="hidden">{{x.feature_id}}</td>
                     <td>{{x.part_reference}}</td>
                     <td>{{x.label}}</td>
                     <td>{{x.creation_date}}</td>

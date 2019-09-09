@@ -17,7 +17,7 @@ app.controller('DisplayProject', function($scope, $http, config) {
     $scope.internal_reference = response.data.project.internal_reference;
     $scope.delivery = response.data.project.expected_delivery;
 
-    $http.get('http://'+url+':'+port+'/getProjectFiles/'+project+'/'+response.data.company).then(function(response){
+    $http.get('http://'+url+':'+port+'/getProjectFiles/'+project).then(function(response){
       console.log(response.data);
       var files = new Array;
       var scan = new Array;
@@ -35,6 +35,14 @@ app.controller('DisplayProject', function($scope, $http, config) {
     });
 
   });
+
+  $http.get('http://'+url+':'+port+'/getQuantities/'+project).then(function(response){
+        $scope.displayQuantity = response.data.quantities;
+        $scope.quantity = 0;
+        $scope.lot_size = "";
+        $scope.nbr_of_lot = 0;
+        $scope.default_label = "";
+      })
 
   $http.get('http://'+url+':'+port+'/getUserCompany').then(function(response){
     $scope.User = response.data.companies.company;
@@ -66,10 +74,6 @@ app.controller('DisplayProject', function($scope, $http, config) {
       $scope.scans = scan;
       $scope.files = files;
     })
-  }
-
-  $scope.showQuantity = function(){
-    window.open('http://'+url+':'+port+'/Vapp2/Quantity.html?'+$scope.project_reference);
   }
 
   $scope.logout = function(){

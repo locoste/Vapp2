@@ -48,7 +48,7 @@ exports.displayPage = function(req, res) {
   var page = req.params.page;
   console.log('displayPage');
   res.writeHead(200, {"Content-Type": "text/html"});
-  fs.readFile('../View/'+page, function(err, html){
+  fs.readFile('./View/'+page, function(err, html){
     if(err){
       throw err;
     }
@@ -68,7 +68,7 @@ exports.displayLoginPage = function(req, res) {
   console.log(req.session); 
   console.log(req.sessionID)*/
   res.writeHead(200, {"Content-Type": "text/html"});
-  fs.readFile('../View/login.html', function(err, html){
+  fs.readFile('./View/login.html', function(err, html){
     if(err){
       throw err;
     }
@@ -79,7 +79,7 @@ exports.displayLoginPage = function(req, res) {
 
 exports.favicon = function(req, res){
   res.writeHead(200, {"Content-Type": "image/png"});
-  fs.readFile('../images/favicon.png', function(err, image){
+  fs.readFile('./images/favicon.png', function(err, image){
     if(err){
       throw err;
     }
@@ -94,7 +94,7 @@ exports.createUserPage = function(req, res) {
   console.log(req.session); 
   console.log(req.sessionID)*/
   res.writeHead(200, {"Content-Type": "text/html"});
-  fs.readFile('../View/CreateUser.html', function(err, html){
+  fs.readFile('./View/CreateUser.html', function(err, html){
     if(err){
       throw err;
     }
@@ -106,7 +106,7 @@ exports.createUserPage = function(req, res) {
 exports.get3DScript = function(req, res) {
   var script = req.params.script;
   res.writeHead(200, {"Content-Type": "text/plain"});
-  fs.readFile('../js/'+script, function(err, js){
+  fs.readFile('./js/'+script, function(err, js){
     if(err){
       throw err;
     }
@@ -119,7 +119,7 @@ exports.getController = function(req, res) {
   var script = req.params.script;
   res.writeHead(200, {"Content-Type": "text/plain"});
   if (script == 'Project.js'){
-    fs.readFile('./app/'+script, function(err, js){
+    fs.readFile('./Server/app/'+script, function(err, js){
       if(err){
         throw err;
       }
@@ -128,7 +128,7 @@ exports.getController = function(req, res) {
     })
   }
   else {
-    fs.readFile('./app/controller/'+script, function(err, js){
+    fs.readFile('./Server/app/controller/'+script, function(err, js){
       if(err){
         throw err;
       }
@@ -141,7 +141,7 @@ exports.getController = function(req, res) {
 exports.displayImages = function(req, res) {
   var image = req.params.image;
   res.writeHead(200, {"Content-Type": "image/jpg"});
-  fs.readFile('../images/'+image, function(err, image){
+  fs.readFile('./images/'+image, function(err, image){
     if(err){
       throw err;
     }
@@ -160,7 +160,7 @@ exports.findAllProject = function(req, res) {
 
 exports.getFeaturesForProject = function(req, res) {
 	var project = req.params.project;
-	query = 'select * FROM features F JOIN product P on F.feature_id=P.features JOIN project PR on P.project=PR.project_id WHERE project_name = "' + project +'";'
+	query = 'select * FROM features F JOIN project P on P.project_id=F.project WHERE project_name = "' + project +'";'
 	odbcConnector(query, function(result) {
     res.write(JSON.stringify(result));
     res.end();
@@ -286,13 +286,13 @@ exports.featuresValidation = function(req, res) {
 exports.getProductInformation = function(req, res) {
   var feature = req.params.feature;
   var row = '{ "project" : "';
-  query = 'SELECT project_name FROM project PR join product P on P.project=PR.project_id join features F on P.features=F.feature_id WHERE feature_id = ' + feature
+  query = 'SELECT project_name FROM project P join features F on P.project_id=F.project WHERE feature_id = ' + feature
   odbcConnector(query, function(result){
     row += result[0].project_name + '",'
   })
-  query = 'SELECT product_name, is_metal, is_plastic FROM product P JOIN features F on P.features=F.feature_id WHERE feature_id = ' + feature
+  query = 'SELECT part_reference, is_metal, is_plastic FROM features WHERE feature_id = ' + feature
   odbcConnector(query, function(result) {
-    row += '"product": { "product_name": "'+ result[0].project_name + '",'
+    row += '"product": { "product_name": "'+ result[0].part_reference + '",'
     row += '"metal": "' + result[0].is_metal +'", ' + '"plastic": "' + result[0].is_plastic + '"}}'
     res.write(row);
     res.end();
@@ -368,7 +368,7 @@ exports.setDecision = function (req, res) {
 
 exports.projectSummary = function(req, res) {
   var project = req.params.project;
-  var query = 'SELECT company, part_reference, label FROM project P JOIN customer C on P.customer=C.customer_id JOIN product PR on P.project_id = PR.project JOIN features F on PR.features = F.feature_id WHERE project_name = "' + project + '";'
+  var query = 'SELECT company, part_reference, label FROM project P JOIN customer C on P.customer=C.customer_id JOIN features F on P.project_id = F.project WHERE project_name = "' + project + '";'
   odbcConnector(query, function(result) {
     var row = '{"project": {'
     row += '"company": "' + result[0].company + '",'
@@ -426,7 +426,6 @@ exports.getCompanies = function (req, res) {
 
 exports.getProjectFiles = function(req, res){
   var project = req.params.project;
-  var company = req.params.company;
   var user = req.user.customer
   query = 'SELECT document_name, feature FROM documents WHERE project = (SELECT project_id FROM project WHERE project_name ="' + project +'" AND customer = '+user+')';
   odbcConnector(query, function(result){
@@ -447,7 +446,9 @@ exports.getFiles = function(req, res){
 exports.getproductDataAnalysis = function(req, res){
  try {
   var project = req.params.project;
+  console.log('get analysis')
   scriptFile.analyseArticles(project, function(result){
+    console.log(result)
     res.send(result);
   })
 } catch (err) {
@@ -571,7 +572,7 @@ function sendEmail(object, text){
 exports.getCssFiles = function(req, res){
 var file = req.params.file;
 res.writeHead(200, {"Content-Type": "text/css"});
-fs.readFile('../View/css/'+file, function(err, css){
+fs.readFile('./View/css/'+file, function(err, css){
 if(err){  
  throw err;
 }

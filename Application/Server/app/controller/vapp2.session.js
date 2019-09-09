@@ -1,7 +1,6 @@
 const uuid = require('uuid/v4')
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
-const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var request = require('../database/requestToDatabase.js')
