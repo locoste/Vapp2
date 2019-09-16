@@ -505,11 +505,13 @@ function odbcConnector(request, callback){
   try {
     const id = {
       host : odbc_url,
-      path: '/api/odbcModels/requestdb?request='+escape(request),
+      //path: '/api/odbcModels/requestdb?request='+escape(request),
+      path: '/odbcvApp2/v1/api/odbcModels/requestdb?request='+escape(request),
       port: odbc_port,
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'rejectUnauthorized':false
       }
     };  
 
@@ -525,7 +527,7 @@ function odbcConnector(request, callback){
       })
     }
 
-    const idReq = http.request(id, idCallback);
+    const idReq = https.request(id, idCallback);
     idReq.end();
   } catch(e){
     console.log(e)

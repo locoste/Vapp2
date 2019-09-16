@@ -3,6 +3,7 @@ let mysql = require('mysql');
 var fs = require("fs");
 var dateformat = require('dateformat');
 var http = require('http');
+var https = require('https');
 
 const odbc_url = process.env.ODBC_URL; 
 const odbc_port = process.env.ODBC_PORT;
@@ -62,34 +63,35 @@ function getDataTARDY(request, callback){
 }
 
 function odbcConnector(request, callback){
-      try {
-        const id = {
-          host : odbc_url,
-          path: '/api/odbcModels/requestdb?request='+escape(request),
-          port: odbc_port,
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        };  
-
-        const idCallback = function(response) {
-          let str = '';
-          response.on('data', function(chunk) {
-            str += chunk;
-          });
-
-          response.on('end', function(){
-            var result = JSON.parse(str)
-            callback(result.request);
-          })
-        }
-
-        const idReq = http.request(id, idCallback);
-        idReq.end();
-      } catch(e){
-        console.log(e)
+  try {
+    const id = {
+      host : odbc_url,
+      //path: '/api/odbcModels/requestdb?request='+escape(request),
+      path: '/odbcvApp2/v1/api/odbcModels/requestdb?request='+escape(request),
+      port: odbc_port,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
+    };  
+
+    const idCallback = function(response) {
+      let str = '';
+      response.on('data', function(chunk) {
+        str += chunk;
+      });
+
+      response.on('end', function(){
+        var result = JSON.parse(str)
+        callback(result.request);
+      })
+    }
+
+    const idReq = https.request(id, idCallback);
+    idReq.end();
+  } catch(e){
+    console.log(e)
+  }
 }
 
 function processMasteryDegree(refArticle, quantity, price, callback){
@@ -280,7 +282,7 @@ exports.analyseArticles = function(project, callback){
         var done=false;
         for(const item of resultAnalysis){
           if(line.part_reference==item.part_reference && line.quantity==item.quantity){
-            console.log(line.part_reference+' ahs already be calculated')
+            console.log(line.part_reference+' has already be calculated')
             resultDataAnalysis.push({feature_id:item.feature, feature:item.part_reference, quantity:item.quantity, coefficient: item.coefficient, masteryDegree: item.mastery_degree, rebus: item.rebus, costProd: item.cost_production });
             done=true;
             console.log('1')
