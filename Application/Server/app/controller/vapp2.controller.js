@@ -1,6 +1,6 @@
 var request = require('../database/requestToDatabase.js')
 var scriptFile = require('../script/testbi.js');
-var dateFormat = require('dateFormat');
+var dateFormat = require('dateformat');
 const https = require('https');
 var http = require('http');
 var fs = require('fs');
